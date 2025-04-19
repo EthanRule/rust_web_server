@@ -1,1 +1,1 @@
-pub const SERVER_ADDR: &str = "[::]:3000";
+pub const SERVER_ADDR: &str = "[::]:3000"; // IPv4, IPv6

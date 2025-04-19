@@ -1,0 +1,5 @@
+tab_spaces = 4
+use_small_heuristics = "Max"
+max_width = 150 # Set maximum line width
+edition = "2021" # Set the Rust edition to 2021
+newline_style = "Unix" # Use Unix-style line endings

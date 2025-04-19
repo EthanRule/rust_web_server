@@ -1,24 +1,16 @@
-use hyper::{Request, Response, Method, StatusCode};
+use http_body_util::{BodyExt, Empty, Full, combinators::BoxBody};
 use hyper::body::{Body, Bytes};
-use http_body_util::{combinators::BoxBody, BodyExt, Empty, Full};
+use hyper::{Method, Request, Response, StatusCode};
 
 pub async fn handle_request(req: Request<hyper::body::Incoming>) -> Result<Response<BoxBody<Bytes, hyper::Error>>, hyper::Error> {
     match (req.method(), req.uri().path()) {
-        (&Method::GET, "/") => {
-            Ok(Response::new(full("Welcome to the Home Page!")))
-        },
-        (&Method::GET, "/hello") => {
-            Ok(Response::new(full("Hello, World!")))
-        },
-        (&Method::POST, "/echo") => {
-            Ok(Response::new(req.into_body().boxed()))
-        },
+        (&Method::GET, "/") => Ok(Response::new(full("Welcome to the Home Page!"))),
+        (&Method::GET, "/hello") => Ok(Response::new(full("Hello, World!"))),
+        (&Method::POST, "/echo") => Ok(Response::new(req.into_body().boxed())),
         (&Method::POST, "/echo/uppercase") => {
             let frame_stream = req.into_body().map_frame(|frame| {
                 let frame = if let Ok(data) = frame.into_data() {
-                    data.iter()
-                        .map(|byte| byte.to_ascii_uppercase())
-                        .collect::<Bytes>()
+                    data.iter().map(|byte| byte.to_ascii_uppercase()).collect::<Bytes>()
                 } else {
                     Bytes::new()
                 };
@@ -26,7 +18,7 @@ pub async fn handle_request(req: Request<hyper::body::Incoming>) -> Result<Respo
             });
 
             Ok(Response::new(frame_stream.boxed()))
-        },
+        }
         (&Method::POST, "/echo/reversed") => {
             let upper = req.body().size_hint().upper().unwrap_or(u64::MAX);
             if upper > 1024 * 64 {
@@ -36,13 +28,10 @@ pub async fn handle_request(req: Request<hyper::body::Incoming>) -> Result<Respo
             }
 
             let whole_body = req.collect().await?.to_bytes();
-            let reversed_body = whole_body.iter()
-                .rev()
-                .cloned()
-                .collect::<Vec<u8>>();
+            let reversed_body = whole_body.iter().rev().cloned().collect::<Vec<u8>>();
 
             Ok(Response::new(full(reversed_body)))
-        },
+        }
 
         // Return 404
         _ => {
@@ -54,13 +43,9 @@ pub async fn handle_request(req: Request<hyper::body::Incoming>) -> Result<Respo
 }
 
 fn empty() -> BoxBody<Bytes, hyper::Error> {
-    Empty::<Bytes>::new()
-        .map_err(|never| match never {})
-        .boxed()
+    Empty::<Bytes>::new().map_err(|never| match never {}).boxed()
 }
 
 fn full<T: Into<Bytes>>(chunk: T) -> BoxBody<Bytes, hyper::Error> {
-    Full::new(chunk.into())
-        .map_err(|never| match never {})
-        .boxed()
+    Full::new(chunk.into()).map_err(|never| match never {}).boxed()
 }
