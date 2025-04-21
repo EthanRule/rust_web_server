@@ -1,0 +1,10 @@
+pub mod connect;
+pub mod delete;
+pub mod get;
+pub mod head;
+pub mod options;
+pub mod patch;
+pub mod post;
+pub mod put;
+pub mod trace;
+pub use methods::get;
