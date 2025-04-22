@@ -7,7 +7,6 @@ Rust Web Server
 - HTTP/2
 - IPV4, IPV6
 - GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS, and TRACE
-- 
 
 ## Development in Powershell
 
