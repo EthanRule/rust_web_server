@@ -1,7 +1,8 @@
 use http_body_util::{BodyExt, Empty, Full, combinators::BoxBody};
 use hyper::body::{Body, Bytes};
 use hyper::{Method, Request, Response, StatusCode};
-mod methods;
+
+use crate::routes::methods; 
 
 pub async fn handle_request(req: Request<hyper::body::Incoming>) -> Result<Response<BoxBody<Bytes, hyper::Error>>, hyper::Error> {
     match (req.method()) {

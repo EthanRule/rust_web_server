@@ -7,4 +7,4 @@ pub mod patch;
 pub mod post;
 pub mod put;
 pub mod trace;
-pub use methods::get;
+pub use super::methods;
