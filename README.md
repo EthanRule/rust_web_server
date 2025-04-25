@@ -6,7 +6,7 @@ Rust Web Server
 
 - HTTP/2
 - IPV4, IPV6
-- GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS, and TRACE
+- GET, POST
 
 ## Commands
 
@@ -17,3 +17,5 @@ Rust Web Server
 ```curl.exe -X POST http://localhost:3000/echo/reversed -d "Some data"```  
 ```curl.exe http://localhost:3000/```  
 
+###
+Web server is a proxy between front and backend. Examples are Node and Bun
