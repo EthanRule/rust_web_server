@@ -1,3 +1,5 @@
+use hello::ThreadPool;
+
 use std::{
     fs,
     io::{prelude::*, BufReader},
