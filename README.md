@@ -19,3 +19,5 @@ Rust Web Server
 
 ###
 Web server is a proxy between front and backend. Examples are Node and Bun
+
+### Hello folder contains turtorial from the rust book
