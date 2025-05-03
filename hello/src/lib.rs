@@ -2,6 +2,10 @@ use std::{
     sync::{mpsc, Arc, Mutex},
     thread,
 };
+use sysinfo::{
+    Components, Disks, Networks, System,
+};
+
 
 pub struct ThreadPool {
     workers: Vec<Worker>,
@@ -28,8 +32,7 @@ impl ThreadPool {
         let mut workers = Vec::with_capacity(size);
 
         for id in 0..size {
-            workers.push(Worker::new(id, Arc::clone(&receiver)));
-        
+            workers.push(Worker::new(id, Arc::clone(&receiver))); 
         }
 
         ThreadPool { 
@@ -84,5 +87,21 @@ impl Worker {
         });
         
         Worker { id, thread }
+    }
+}
+
+pub struct Hardware {
+    pub cores: usize,
+    pub threads: usize,
+    pub os: String,
+}
+
+impl Hardware {
+    pub fn new() -> Hardware {
+        let sys = System::new_all();
+        let cores = sys.cpus().len();
+        let threads = cores * 2;
+        let os = System::os_version();
+        Hardware { cores, threads, os: os.expect("REASON") }
     }
 }
