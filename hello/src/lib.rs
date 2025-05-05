@@ -2,9 +2,7 @@ use std::{
     sync::{mpsc, Arc, Mutex},
     thread,
 };
-use sysinfo::{
-    Components, Disks, Networks, System,
-};
+use sysinfo::System;
 
 
 pub struct ThreadPool {
@@ -91,17 +89,16 @@ impl Worker {
 }
 
 pub struct Hardware {
-    pub cores: usize,
-    pub threads: usize,
+    pub logical_processors: usize,
     pub os: String,
 }
 
 impl Hardware {
     pub fn new() -> Hardware {
         let sys = System::new_all();
-        let cores = sys.cpus().len();
-        let threads = cores * 2;
-        let os = System::os_version();
-        Hardware { cores, threads, os: os.expect("REASON") }
+        let logical_processors = sys.cpus().len();
+        let os = System::long_os_version().unwrap_or(String::from("Operating system not found!"));
+        println!("Logical processors found: {}, OS found: {}", logical_processors, os); 
+        Hardware { logical_processors, os: os }
     }
 }

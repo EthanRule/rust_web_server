@@ -11,8 +11,8 @@ use std::{
 
 fn main() {
     let listner = TcpListener::bind("127.0.0.1:7878").unwrap();
-    // let hardware = Hardware::new();
-    let pool = ThreadPool::new(4);
+    let hardware = Hardware::new();
+    let pool = ThreadPool::new(hardware.logical_processors);
 
     for stream in listner.incoming() {
         let stream = stream.unwrap();
