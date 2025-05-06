@@ -15,7 +15,7 @@ type Job = Box<dyn FnOnce() + Send + 'static>;
 impl ThreadPool {
     /// Create a new ThreadPool
     ///
-    /// The size is the number of threads in the pool.
+    /// The size is the number of threads in the pool. 
     ///
     /// # Panics
     ///
@@ -39,6 +39,11 @@ impl ThreadPool {
         }
     }
 
+    /// Executes a closure that one of the workers will pick up. 
+    ///
+    /// # Panics
+    ///
+    /// The `execute` function panics when the sender reference or job does not exist.
     pub fn execute<F>(&self, f: F)
     where
         F: FnOnce() + Send + 'static,
@@ -50,6 +55,11 @@ impl ThreadPool {
 }
 
 impl Drop for ThreadPool {
+    /// Drops workers for shutting down threadpool.
+    ///
+    /// # Panics
+    ///
+    /// The `drop` fn panics when worker.thread.join() is an Err().
     fn drop(&mut self) {
         drop(self.sender.take());
 
