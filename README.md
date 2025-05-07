@@ -1,23 +1,27 @@
 # Rust-Web-Server
 
-Rust Web Server
+There are two different servers. The first server is implemented using the Hyper crate. And the second
+server is implemented based off the `Rust Programming Book` with additional features and error handling.  
 
-## Support
+The hyper server was partially built first while the `Rust Programming Book` server is more extensive
+and is the current version in continual development.
+
+## Hyper Server
+
+### Support
 
 - HTTP/2
 - IPV4, IPV6
-- GET, POST
-
-## Commands
-
-### Run Code
-```cargo run```  
+- GET
 
 ### Send Client -> Server Requests
 ```curl.exe -X POST http://localhost:3000/echo/reversed -d "Some data"```  
 ```curl.exe http://localhost:3000/```  
 
-###
-Web server is a proxy between front and backend. Examples are Node and Bun
+## Server (`Rust Programming Book` extension)
 
-### Hello folder contains turtorial from the rust book
+### Support
+
+- HTTP/1
+- Multithreading
+- GET
