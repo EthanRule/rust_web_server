@@ -112,3 +112,21 @@ impl Hardware {
         Hardware { logical_processors, os: os }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+        
+    #[test]
+    fn test_new_hardware_logical_processors() {
+        let hardware = Hardware::new();
+        assert!(hardware.logical_processors > 0);
+    }
+
+    #[test]
+    fn test_new_hardware_os_found() {
+        let hardware = Hardware::new();
+        assert!(hardware.os.len() > 0);
+    }
+
+}
