@@ -25,3 +25,13 @@ and is the current version in continual development.
 - HTTP/1
 - Multithreading
 - GET
+
+#### Sending Requests
+Visit: `127.0.0.1:7878` or `127.0.0.1:7878/sleep`
+
+Sleep requests take 5 seconds to respond. The server allows multiple  
+requests to be sent at a time, using a threadpool and queue to manage.  
+
+Threadpool size is determined by the number of threads your CPU's hardware  
+has available.  
+
