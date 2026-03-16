@@ -1,16 +1,19 @@
-use hello::ThreadPool;
+// TODO: Migrate this to use axum.
+
 use hello::Hardware;
+use hello::ThreadPool;
 
 use std::{
     fs,
-    io::{prelude::*, BufReader},
+    io::{BufReader, prelude::*},
     net::{TcpListener, TcpStream},
     thread,
     time::Duration,
 };
 
 fn main() {
-    let listner = TcpListener::bind("127.0.0.1:7878").expect("Failed to bind address. Check if address is already in use.");
+    let listner = TcpListener::bind("127.0.0.1:7878")
+        .expect("Failed to bind address. Check if address is already in use.");
     let hardware = Hardware::new();
     let pool = ThreadPool::new(hardware.logical_processors);
 
@@ -53,5 +56,7 @@ fn handle_connection(mut stream: TcpStream) {
 
     let length = contents.len();
     let response = format!("{status_line}\r\nContent-Length: {length}\r\n\r\n{contents}");
-    stream.write_all(response.as_bytes()).expect("Failed to write bytes to stream");
+    stream
+        .write_all(response.as_bytes())
+        .expect("Failed to write bytes to stream");
 }
