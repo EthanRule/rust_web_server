@@ -1,4 +1,5 @@
 // TODO: Migrate this to use axum.
+use axum::{Router, routing::get};
 
 use hello::Hardware;
 use hello::ThreadPool;
@@ -12,11 +13,12 @@ use std::{
 };
 
 fn main() {
-    let listner = TcpListener::bind("127.0.0.1:7878")
+    let listner = TcpListener::bind("127.0.0.1:7878") // Local
         .expect("Failed to bind address. Check if address is already in use.");
     let hardware = Hardware::new();
     let pool = ThreadPool::new(hardware.logical_processors);
 
+    // client thread pool
     for stream in listner.incoming() {
         let stream = stream.expect("Failed to get stream from TcpListner");
 
@@ -26,6 +28,7 @@ fn main() {
     }
 }
 
+// Listen for commands here
 fn handle_connection(mut stream: TcpStream) {
     let buf_reader = BufReader::new(&stream);
     let request_line = match buf_reader.lines().next() {
@@ -39,6 +42,10 @@ fn handle_connection(mut stream: TcpStream) {
             return;
         }
     };
+
+    // Send request_line to Core and wait
+
+    // Receive status update from Core and continue
 
     let (status_line, filename) = match &request_line[..] {
         "GET / HTTP/1.1" => ("HTTP/1.1 200 OK", "hello.html"),
