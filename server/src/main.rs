@@ -2,80 +2,58 @@
 use axum::{Router, routing::get};
 
 use hello::Hardware;
-use hello::ThreadPool;
-use reqwest::Client;
 use std::error::Error;
-use std::time::Duration;
+use tokio::io::{AsyncBufReadExt, AsyncReadExt, AsyncWriteExt, BufReader};
+use tokio::net::{TcpListener, TcpStream};
 
-use std::{
-    fs,
-    io::{BufReader, prelude::*},
-    net::{TcpListener, TcpStream},
-    thread,
-};
-
-fn main() {
-    let listner = TcpListener::bind("127.0.0.1:7878") // Local
-        .expect("Failed to bind address. Check if address is already in use.");
+#[tokio::main]
+async fn main() {
     let hardware = Hardware::new();
-    let pool = ThreadPool::new(hardware.logical_processors);
+    let listner = TcpListener::bind("127.0.0.1:7878")
+        .await
+        .expect("Failed to bind address. Check if address is already in use.");
 
-    // client thread pool
-    for stream in listner.incoming() {
-        let stream = stream.expect("Failed to get stream from TcpListner");
-
-        pool.execute(|| {
-            handle_connection(stream);
+    loop {
+        let (stream, _) = listner
+            .accept()
+            .await
+            .expect("Failed to get stream from TcpListener");
+        tokio::spawn(async move {
+            handle_connection(stream).await;
         });
     }
 }
 
-#[tokio::main]
-async fn client_connection() -> Result<(), Box<dyn Error>> {
-    let ipv6_address = "[::1]:8080";
-    let request_url = format!("http://{}", ipv6_address);
-
-    let client = Client::builder()
-        .connect_timeout(Duration::from_secs(10))
-        .build()?;
-
-    println!("Attempting to connect to {}", request_url);
-
-    // Make a GET request or any in the future
-    let response = client.get(&request_url).send().await;
-
-    match response {
-        Ok(resp) => {
-            println!("Status: {}", resp.status());
-            let body = resp.text().await?;
-            println!("Body: {}", body);
-        }
-        Err(e) => {
-            eprintln!("Failed to connect to the server or request failed: {}", e);
-        }
-    }
-
+async fn send_recv() -> Result<(), Box<dyn Error>> {
+    let mut stream = TcpStream::connect("127.0.0.1:8080").await?;
+    println!("sending...");
+    stream.write_all(b"hello world!").await?;
+    let mut buf = vec![0; 1024];
+    let n = stream.read(&mut buf).await?;
+    println!("received: {:?}", n);
     Ok(())
 }
 
 // Listen for commands here
-fn handle_connection(mut stream: TcpStream) {
-    let buf_reader = BufReader::new(&stream);
-    let request_line = match buf_reader.lines().next() {
-        Some(Ok(line)) => line,
-        Some(Err(e)) => {
-            eprintln!("Error reading line: {}", e);
+async fn handle_connection(mut stream: TcpStream) {
+    println!("new connection!");
+    let buf_reader = BufReader::new(&mut stream);
+    let mut lines = buf_reader.lines();
+    let request_line = match lines.next_line().await {
+        Ok(Some(line)) => line,
+        Ok(None) => {
+            eprintln!("No lines received in the request.");
             return;
         }
-        None => {
-            eprintln!("No lines received in the request.");
+        Err(e) => {
+            eprintln!("Error reading line: {}", e);
             return;
         }
     };
 
     // Send request_line to Core and wait (needs to act as a client here by connecting to Core)
     // Connect to IPV6, 8080.
-    let _ = client_connection();
+    let _ = send_recv().await;
 
     // Receive status update from Core and continue
 
@@ -97,5 +75,6 @@ fn handle_connection(mut stream: TcpStream) {
     // let response = format!("{status_line}\r\nContent-Length: {length}\r\n\r\n{contents}");
     // stream
     //     .write_all(response.as_bytes())
+    //     .await
     //     .expect("Failed to write bytes to stream");
 }

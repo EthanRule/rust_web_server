@@ -8,4 +8,4 @@ axum = "0.8.8"
 sysinfo = "0.35.0"
 cxx = "1.0"
 reqwest = "0.13.2"
-tokio = { version = "1.50.0", features = ["rt-multi-thread", "macros"] }
+tokio = { version = "1.50.0", features = ["rt-multi-thread", "macros", "net", "io-util"] }
